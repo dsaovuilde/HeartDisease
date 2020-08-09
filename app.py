@@ -139,7 +139,7 @@ app.layout = html.Div([
         html.H1('Descriptive Model', style={'textAlign': 'center'}),
     html.Div([
         dcc.Graph(
-            figure=(fig2)
+            figure=(fig1) #testing if heatmap crashed heroku
         )
     ], style={'display': 'inline-block'}),
         html.Div([
