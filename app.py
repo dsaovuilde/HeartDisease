@@ -38,9 +38,6 @@ X = scaler.fit_transform(X)
 X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.2, random_state=1)
 X_train2, X_test2, y_train2, y_test2 = train_test_split(heart.drop('target',axis=1),y, test_size=0.2, random_state=1)
 X_test2['target']= y_test2
-
-
-
 rf = RandomForestClassifier(n_estimators=644, min_samples_split=10, min_samples_leaf=1, max_features='sqrt', max_depth=40, bootstrap=False, random_state=4)
 rf.fit(X_train, y_train)
 prediction = rf.predict(X_test)
@@ -61,13 +58,13 @@ false_negatives = len(y_test[fn_filter])
 
 
 sensitivity = true_positives / (true_positives + false_negatives)
-specificity =  true_negatives / (true_negatives + false_positives)
+specificity = true_negatives / (true_negatives + false_positives)
 
 
 def plot_confusion_matrix():
     cm = confusion_matrix(y_test, prediction)
     labels = ['False', 'True']
-    data = go.Heatmap(z=cm, y=labels, x=labels, colorscale = 'tealgrn')
+    data = go.Heatmap(z=cm, y=labels, x=labels, colorscale='tealgrn')
     annotations = []
     for i, row in enumerate(cm):
         for j, value in enumerate(row):
