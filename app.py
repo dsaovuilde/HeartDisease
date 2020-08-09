@@ -26,7 +26,7 @@ server = app.server
 
 
 # download CSV file from gitHub
-url = 'https://raw.githubusercontent.com/dsaovuilde/heart_disease/master/Data/Heart.csv'
+url = 'https://raw.githubusercontent.com/dsaovuilde/HeartDisease/master/Data/Heart.csv'
 heart = pd.read_csv(url)
 
 
