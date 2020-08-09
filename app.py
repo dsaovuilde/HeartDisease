@@ -1,6 +1,6 @@
 import dash
 import pandas as pd
-import dash_auth
+#import dash_auth
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
@@ -14,7 +14,7 @@ from sklearn.linear_model import LogisticRegression
 
 USERNAME_PASSWORD_PAIRS = {'test': 'test'}
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
-auth = dash_auth.BasicAuth(app, USERNAME_PASSWORD_PAIRS)
+#auth = dash_auth.BasicAuth(app, USERNAME_PASSWORD_PAIRS)
 server = app.server
 
 # download CSV file from gitHub
