@@ -1,29 +1,21 @@
 import dash
-import flask
 import pandas as pd
 import dash_auth
-import os
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import dash_table
 import plotly.graph_objs as go
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix, accuracy_score
 from sklearn.linear_model import LogisticRegression
-import seaborn as sns
-from random import randint
 
 USERNAME_PASSWORD_PAIRS = {'test': 'test'}
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
 auth = dash_auth.BasicAuth(app, USERNAME_PASSWORD_PAIRS)
 server = app.server
-# server = flask.Flask(__name__)
-# server.secret_key = os.environ.get('secret_key', str(randint(0, 1000000)))
-# app = dash.Dash(__name__, server=server)
-
 
 # download CSV file from gitHub
 url = 'https://raw.githubusercontent.com/dsaovuilde/HeartDisease/master/Data/Heart.csv'
