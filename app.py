@@ -1,26 +1,22 @@
 import dash
-import pandas as pd
-#import dash_auth
+import plotly.graph_objs as go
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output
 import dash_table
-import plotly.graph_objs as go
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix, accuracy_score
 from sklearn.linear_model import LogisticRegression
 
-USERNAME_PASSWORD_PAIRS = {'test': 'test'}
-app = dash.Dash(__name__, suppress_callback_exceptions=True)
-#auth = dash_auth.BasicAuth(app, USERNAME_PASSWORD_PAIRS)
+
+app = dash.Dash(__name__,)
 server = app.server
 
 # download CSV file from gitHub
 url = 'https://raw.githubusercontent.com/dsaovuilde/HeartDisease/master/Data/Heart.csv'
 heart = pd.read_csv(url)
-
 
 #train_test split to split the dataframe into test data and train data for prediction models
 y = pd.DataFrame(heart['target'])
@@ -35,10 +31,10 @@ rf.fit(X_train, y_train)
 prediction = rf.predict(X_test)
 accuracy = accuracy_score(y_test, prediction)
 
-
 y_test2['predicted'] = prediction
 X_test2['predicted'] = prediction
 
+# calculate sensitivity and specificity
 tp_filter = (y_test2['predicted'] == 1) & (y_test2['target'] == 1)
 true_positives = len(y_test[tp_filter])
 tn_filter = (y_test2['predicted'] == 0) & (y_test2['target'] == 0)
@@ -47,8 +43,6 @@ fp_filter = (y_test2['predicted'] == 1) & (y_test2['target'] == 0)
 false_positives = len(y_test[fp_filter])
 fn_filter = (y_test2['predicted'] == 0) & (y_test2['target'] == 1)
 false_negatives = len(y_test[fn_filter])
-
-
 sensitivity = true_positives / (true_positives + false_negatives)
 specificity = true_negatives / (true_negatives + false_positives)
 
@@ -80,8 +74,6 @@ def plot_confusion_matrix():
     fig = go.Figure(data=data, layout=layout)
     return fig
 
-
-
 # Graph showing presence of chest pain and odds of heart disease
 cp1 = heart[heart['cp']==1]
 cp1_pos = cp1[cp1['target']==1].shape[0]
@@ -94,10 +86,10 @@ cp0_pos = cp0[cp0['target']==1].shape[0]
 
 odds = [cp0_pos/cp0.shape[0], cp1_pos/cp1.shape[0], cp2_pos/cp2.shape[0], cp3_pos/cp3.shape[0]]
 
+
 cols = list(heart.columns.values)
 cols.remove('target')
 lr = LogisticRegression(random_state=0).fit(X,y)
-
 
 heatmap = go.Heatmap(
    x = list(heart.columns.values),
@@ -111,17 +103,18 @@ data = [heatmap]
 for col in heart.columns:
     num = heart[col].max() - heart[col].min()
 
-
+# fig1 is a bar graph of logistic regression coefficients
 fig1 = go.Figure([go.Bar(x=cols, y=lr.coef_[0])])
 fig1.update_layout(title='coefficients')
 fig1.update_layout(xaxis_title='Intercept = .12508204')
 
+#fig2 is heatmap
 fig2 = go.Figure(data=data,
                             layout=go.Layout(
         title=go.layout.Title(text='Heatmap')
                             )
                         )
-
+#fig3 graph depicting odds of having heart disease based on type of chest pain
 fig3= go.Figure(go.Bar(
             x=odds,
             y=['asymptomatic','typical angina','atypical angina','non-anginal pain'],
@@ -139,7 +132,7 @@ app.layout = html.Div([
         html.H1('Descriptive Model', style={'textAlign': 'center'}),
     html.Div([
         dcc.Graph(
-            figure=(fig1) #testing if heatmap crashed heroku
+            figure=(fig2) 
         )
     ], style={'display': 'inline-block'}),
         html.Div([
@@ -194,16 +187,5 @@ html.Div([
 ])
 
 
-@app.callback(Output('table', 'children'),
-              [Input('table', 'selected_columns')]
-              )
-def update_table(selected_columns):
-    return [{
-        'if': {'column_id': i},
-        'background_color': '#D2F3FF'
-    } for i in selected_columns]
-
-
 if __name__ == '__main__':
     app.run_server(debug=True)
-
