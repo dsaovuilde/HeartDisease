@@ -185,7 +185,9 @@ html.Div([
     html.P(u'Specificity: {}'.format(specificity))
 ])
 ])
-
+print(accuracy)
+print(sensitivity)
+print(specificity)
 
 if __name__ == '__main__':
     app.run_server(debug=True)
