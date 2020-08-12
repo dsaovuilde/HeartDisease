@@ -154,7 +154,7 @@ html.Div([
     ]),
     html.Div([
         html.H1('Odds of Heart Disease'),
-        html.P('Select a variable and increase or decrease the slider to see the effect of incremental changes on odd of having heart disease.'),
+        html.P('Select a variable and increase or decrease the slider to see the effect of incremental changes on the odds of having heart disease.'),
         html.P('NOTE: Blood pressure has a negative correlation in this dataset likely due to the number of patients with high BP who are otherwise healthy thus no disease.'),
         html.Div([
             dcc.RadioItems(
