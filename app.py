@@ -28,14 +28,14 @@ rf = RandomForestClassifier(n_estimators=733, min_samples_split=5, min_samples_l
 rf.fit(X_train, y_train)
 prediction = rf.predict(X_test)
 accuracy = accuracy_score(y_test, prediction)
-
-
+dt = pd.DataFrame(X_test)
+dt['predicted'] = prediction
+dt['actual'] = y_test
 cm = confusion_matrix(y_test, prediction)
-print(cm)
-# calculate sensitivity and specificity
 
-true_positives = cm[0][0]
-true_negatives = cm[1][1]
+# calculate sensitivity and specificity
+true_negatives = cm[0][0]
+true_positives = cm[1][1]
 false_positives = cm[0][1]
 false_negatives = cm[1][0]
 sensitivity = true_positives / (true_positives + false_negatives)
@@ -68,18 +68,6 @@ def plot_confusion_matrix():
     fig = go.Figure(data=data, layout=layout)
     return fig
 
-
-# Graph showing presence of chest pain and odds of heart disease
-cp1 = heart[heart['cp'] == 1]
-cp1_pos = cp1[cp1['target'] == 1].shape[0]
-cp2 = heart[heart['cp'] == 2]
-cp2_pos = cp2[cp2['target'] == 1].shape[0]
-cp3 = heart[heart['cp'] == 3]
-cp3_pos = cp3[cp3['target'] == 1].shape[0]
-cp0 = heart[heart['cp'] == 0]
-cp0_pos = cp0[cp0['target'] == 1].shape[0]
-
-odds = [cp0_pos / cp0.shape[0], cp1_pos / cp1.shape[0], cp2_pos / cp2.shape[0], cp3_pos / cp3.shape[0]]
 
 cols = list(heart.columns.values)
 cols.remove('target')
@@ -188,7 +176,7 @@ html.Div([
             html.H1('Predictive Model', style={'textAlign': 'center'}),
             html.Div([dash_table.DataTable(
                 id='table',
-                columns=[{'name': i, 'id': i} for i in X_test.columns],
+                columns=[{'name': i, 'id': i, 'type': 'numeric'} for i in dt.columns],
                 data=pd.DataFrame(X_test).to_dict('records'),
                 editable=True,
                 filter_action='native',
@@ -202,8 +190,7 @@ html.Div([
                     'overflowY': 'scroll'
                 }
             ),
-                html.P(
-                    'Table can be sorted and filtered. To filter search for strings rather than numbers. (\'6.2\' instead of 6.2)'), ]),
+                html.P('Table can be sorted and filtered. Use arrows next to columns to sort. Type in filter boxes to filter.'), ]),
             html.Div(dcc.Graph(figure=plot_confusion_matrix())),
             html.P(u'Overall Accuracy : {}'.format(accuracy)),
             html.P(u'Sensitivity: {}'.format(sensitivity)),
@@ -212,6 +199,15 @@ html.Div([
     ])
 ])
 
+@app.callback(
+    dash.dependencies.Output('table', 'style_data_conditional'),
+    [dash.dependencies.Input('table', 'selected_columns')]
+)
+def update_styles(selected_columns):
+    return [{
+        'if': { 'column_id': i },
+        'background_color': '#D2F3FF'
+    } for i in selected_columns]
 
 @app.callback(
     dash.dependencies.Output('slider_output', 'children'),
@@ -253,6 +249,7 @@ def update_output(slider, radio):
 print(accuracy)
 print(sensitivity)
 print(specificity)
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
