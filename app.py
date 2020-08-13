@@ -23,6 +23,7 @@ y = pd.DataFrame(heart['target'])
 X = heart.drop('target', axis=1)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=123456)
 
+# parameters for rf found by randomsearchCV (code in Optimization.py)
 rf = RandomForestClassifier(n_estimators=733, min_samples_split=5, min_samples_leaf=4, max_features='auto',
                             max_depth=80, bootstrap=True, random_state=7896543)
 rf.fit(X_train, y_train)
@@ -69,6 +70,7 @@ def plot_confusion_matrix():
     return fig
 
 
+# list of column names for x values in lr coefficient bar chart
 cols = list(heart.columns.values)
 cols.remove('target')
 lr = LogisticRegression(random_state=0).fit(X, y)
@@ -107,7 +109,7 @@ fig3.add_trace(
 fig3.update_layout(title='Heart Disease as a function of Age and Maximum Heart rate', xaxis_title='Age',
                    yaxis_title='Max Heart Rate')
 
-# 4 is a scatter chart showing heart disease as a function of type of chest pain and blood pressure
+# fig4 is a scatter chart showing heart disease as a function of type of chest pain and blood pressure
 fig4 = go.Figure()
 fig4.add_trace(
     go.Scatter(x=heart.cp[heart.target == 1], y=heart.trestbps[heart.target == 1], mode='markers', name='Disease'))
@@ -145,17 +147,18 @@ app.layout = html.Div([
             html.P('slope - slope of the peak exercise ST segment'),
             html.P('ca - number of major vessels colored by flouroscopy'),
             html.P('thal - normal/fixed/reversable defect'),
-            html.P('num - narrowing'),
             html.P('target - presence of heart disease')
         ], style={'display': 'inline-block'}),
-html.Div([
+        html.Div([
             dcc.Graph(figure=fig1),
         ], style={'display': 'inline-block'}),
     ]),
     html.Div([
         html.H1('Odds of Heart Disease'),
-        html.P('Select a variable and increase or decrease the slider to see the effect of incremental changes on the odds of having heart disease.'),
-        html.P('NOTE: Blood pressure has a negative correlation in this dataset likely due to the number of patients with high BP who are otherwise healthy thus no disease.'),
+        html.P(
+            'Select a variable and increase or decrease the slider to see the effect of incremental changes on the odds of having heart disease.'),
+        html.P(
+            'NOTE: Blood pressure has a negative correlation in this dataset likely due to the number of patients with high BP who are otherwise healthy thus no disease.'),
         html.Div([
             dcc.RadioItems(
                 id='feature',
@@ -190,7 +193,8 @@ html.Div([
                     'overflowY': 'scroll'
                 }
             ),
-                html.P('Table can be sorted and filtered. Use arrows next to columns to sort. Type in filter boxes to filter.'), ]),
+                html.P(
+                    'Table can be sorted and filtered. Use arrows next to columns to sort. Type in filter boxes to filter.'), ]),
             html.Div(dcc.Graph(figure=plot_confusion_matrix())),
             html.P(u'Overall Accuracy : {}'.format(accuracy)),
             html.P(u'Sensitivity: {}'.format(sensitivity)),
@@ -199,16 +203,18 @@ html.Div([
     ])
 ])
 
+# callback to update table when filtered or sorted.
 @app.callback(
     dash.dependencies.Output('table', 'style_data_conditional'),
     [dash.dependencies.Input('table', 'selected_columns')]
 )
 def update_styles(selected_columns):
     return [{
-        'if': { 'column_id': i },
+        'if': {'column_id': i},
         'background_color': '#D2F3FF'
     } for i in selected_columns]
 
+# callback to update information when slider tool is used.
 @app.callback(
     dash.dependencies.Output('slider_output', 'children'),
     [dash.dependencies.Input('slider', 'value'),
@@ -249,7 +255,6 @@ def update_output(slider, radio):
 print(accuracy)
 print(sensitivity)
 print(specificity)
-
 
 if __name__ == '__main__':
     app.run_server(debug=True)
